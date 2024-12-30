@@ -22,7 +22,6 @@ const fetchCustomerData = () => {
         url: "http://localhost:8080/Application_Web_exploded/customer",
         method: "GET",
         success: (res) => {
-            console.log(res)
             $('#customerTableBody').empty();
             res.forEach(
                 (customer) => {

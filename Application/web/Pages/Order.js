@@ -82,16 +82,19 @@ $('#customerSelect').on('change',  e =>{
 })
 
 const setoid = () => {
+    console.log("order id generated")
     $.ajax({
         url: "http://localhost:8080/Application_Web_exploded/order",
         method: "GET",
-        success: function (res) {
-            let data = res;
-            $('#orderID1').val(data + 1);
+        success : function (response) {
+            let data = response;
+            console.log(data+1);
+            $("#orderID1").val(data+1)
         },
-        error: function (err) {
-            console.log(err);
+        error : function (error){
+            console.log(error)
         }
+
     })
 }
 setoid();
@@ -137,6 +140,7 @@ $('#placeOrder').click((e) => {
         success: function (res) {
             console.log(res);
             console.log(oid,cid,tot);
+            placeOrder(oid)
         },
         error: function (err) {
             console.log(err);
@@ -144,155 +148,59 @@ $('#placeOrder').click((e) => {
     })
 })
 
-function placeOrder(){
-    let oid = $('#orderID1').val();
+function placeOrder(oid){
+    let index = 0;
 
-
-}
-/*
-          #placeorder.click{
-            let oid = $($oid);
-            cid
-            tot // okkoma gaththu tot eka (uda)
-
-            &>ajax({
-                url ; order;
-                method post;
-                data{
-                    oid :oid
-                    cid :cid
-                    tot//
-
-            })
-           ,
-           succsess=>
-           consol.log(response);
-           saveOD();
-})
-      func saveOD(){
-      let oid = $oid
-
-      cartArray.map// loop karaganna puluwan eth nathnnm forEach
-
-      cartArray.forEach (element){
-        $>ajax({
-        url: orderDetail // class ekak hadala urlPattern ekata denna ona menna me url eka
-        method : Post
-        data{
-            oid ; oid ;
-            itemid : element.itemid;  // methnata enne cart ekata daddi hadapu object eke variable name eka
-        }
-
-        success: consollog()  //  OD ekath save unama apita ithuru wela ythinne item qty eka adu krn eka
-        // me innne palaweni element eke
-        reduceItemQty(element.iid, element,qty);  // methni  adu krgnn on a eke id ekai qty ekai yawwa
-        error:
-
-        }
-
-
-        func reduceitemqty(iid , qty){
-        $ajax{
-        url : itemupdate // me thinne aluthen hdena class eka... urlpattern ekath ekka
-        hethuwa item eke update ekk dnt gahala thina nisa... aluth ekk
-
-        method : put;
-
-        data JSON.strinfy{
-        iid :iid
-        qty ; qty;
-        }
-
-        sucsess {}  // tot 0 kkrnn one   // aluth order id ganna one // cart array eka clear krnn one
-        error
-        }
-        }
-
+    cart_array.forEach(element => {
+        console.log(cart_array.length)
+        index++;
+        console.log(element.Iid, oid);
+        $.ajax({
+            url: "http://localhost:8080/Application_Web_exploded/orderDetails",
+            method: "POST",
+            data: {
+                oid:oid,
+                Iid:element.Iid,
+            },
+            success: function (res) {
+                console.log(res);
+                updateItemQty(element.Iid,element.qty,index);
+            },
+            error: function (err) {
+                console.log(err);
+            }
         })
-      }
-      }
+    });
+}
 
+function updateItemQty(Iid,qty,index){
+    $.ajax({
+        url: "http://localhost:8080/Application_Web_exploded/itemUpdate",
+        method: "PUT",
 
+        data: JSON.stringify({
+            Iid : Iid,
+            qty : qty,
+        }),
+        success: function (res) {
+            if (index == cart_array.length){
+                alert("Order Placed Successfully");
+                cart_array.splice(0,cart_array.length);
+                tot = 0;
+                setoid()
+                clearField()
+            }
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    })
+}
 
-* */
-
-
-//     $('#cart').on('click', function (){
-//         let iid = $('#itemSelect').val();
-//         let description = $('#itemName').val();
-//         let unitPrice = $('#unitPrice').val();
-//         let qtyOnhand = $('#qtyOnHand').val();
-//         let qty = $('#qty').val();
-//
-//         // console.log(iid,description,unitPrice,qtyOnhand,qty);
-//
-//         let cart = new CartModels(
-//             iid,
-//             description,
-//             unitPrice,
-//             qtyOnhand,
-//             qty
-//     )
-//         total += qty*unitPrice;
-//         console.log(total);
-//         updateItem(iid ,qty);
-//         $("#total1").val(total);
-//         cart_array.push(cart);
-//
-//         loadOrdertbl();
-//         clearItemdetailform();
-//
-//     });
-//
-// function updateItem(iid, quantity) {
-//     for (let i = 0; i < item_array.length; i++) {
-//         if (iid === item_array[i].code) {
-//             item_array[i].qty = item_array[i].qty - quantity;  // Update quantity in itemary
-//         }
-//     }
-// }
-//
-// const loadOrdertbl = () => {
-//     $("#orderTableBody").empty();
-//     cart_array.map((item, index) => {
-//         console.log(item);
-//         let data = `<tr><td>${item.icode}</td><td>${item.description}</td><td>${item.unitPrice}</td><td>${item.qtyOnHand}</td><td>${item.qty}</td></tr>`
-//         $("#orderTableBody").append(data);
-//     });
-// };
-//
-// const clearItemdetailform  = () => {
-//     $('#itemSelect').val("");
-//     $('#itemName').val("")
-//     $('#unitPrice').val("");
-//     $('#qtyOnHand').val("");
-//     $('#qty').val("");
-// };
-//
-// $("#placeOrder").on('click' , function () {
-//     let cid = $("#customerSelect").val();
-//
-//     $("#orderTableBody tr").each(function () {
-//         let iid = $(this).find("td:eq(0)").text();
-//         let unitprice = $(this).find("td:eq(2)").text();
-//         let qty = $(this).find("td:eq(4)").text();
-//
-//         let itemtot = unitprice*qty;
-//
-//         let order = new OrderModels(
-//             order_array.length+1,
-//             formattedDate,
-//             cid,iid,qty,itemtot
-//         );
-//         order_array.push(order);
-//
-//     });
-//     total=0;
-//     cart_array.splice(0 , cart_array.length);
-//     $("#orderTableBody").empty();
-//     console.log(order_array);
-//     $('#orderID1').val(order_array.length+1);
-//     $("#total1").val('');
-//
-//
-// });
+ const clearField = () => {
+    $('#customerSelect').val('');
+    $('#itemSelect').val('');
+    $('#unitPrice').val('');
+    $('#qty').val('');
+    $('#total1').val('');
+}
